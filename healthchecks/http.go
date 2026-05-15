@@ -1,6 +1,7 @@
 package healthchecks
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -102,14 +103,20 @@ func (h *HTTPHealthCheckJSONPath) Execute() (bool, error) {
 		return false, err
 	}
 
-	result, err := jsonpath.Get("$.store.book[*].title", response)
+	jsonObject := interface{}(nil)
+	err = json.Unmarshal([]byte(response), &jsonObject)
+	if err != nil {
+		return false, fmt.Errorf("response is not a valid JSON: %w", err)
+	}
+
+	result, err := jsonpath.Get(h.JSONPath, jsonObject)
 	if err != nil {
 		return false, err
 	}
 
 	responseValue, ok := result.(string)
 	if !ok {
-		return false, fmt.Errorf("expected value at JSONPath %s is not a string", h.JSONPath)
+		return false, fmt.Errorf("found content value at JSONPath %s is not a string %s", h.JSONPath, string(responseValue))
 	}
 	if responseValue == h.ExpectedValue {
 		return true, nil
