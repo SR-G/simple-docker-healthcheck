@@ -9,6 +9,7 @@ import (
 )
 
 var logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+var osExit = os.Exit
 
 func main() {
 
@@ -92,7 +93,7 @@ func main() {
 			executeHealthCheck(healthCheck)
 		} else {
 			logger.Error().Msg("no expected status code provided for HTTP code healthcheck")
-			os.Exit(1)
+			osExit(1)
 		}
 	} else if commandHTTPTextHealthCheck != nil && commandHTTPTextHealthCheck.Used {
 
@@ -115,7 +116,7 @@ func main() {
 		executeHealthCheck(healthCheck)
 	} else {
 		logger.Error().Msg("no subcommand provided")
-		os.Exit(1)
+		osExit(1)
 	}
 }
 
@@ -123,14 +124,14 @@ func executeHealthCheck(healthCheck healthchecks.HealthCheck) {
 	ok, err := healthCheck.Execute()
 	if err != nil {
 		logger.Error().Err(err).Msg("healthcheck execution failed")
-		os.Exit(1)
+		osExit(1)
 	}
 
 	if ok {
 		logger.Info().Msg("healthcheck passed")
-		os.Exit(0)
+		osExit(0)
 	} else {
 		logger.Warn().Msg("healthcheck failed")
-		os.Exit(1)
+		osExit(1)
 	}
 }
