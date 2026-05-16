@@ -14,24 +14,34 @@ import (
 var logger zerolog.Logger
 var osExit = os.Exit
 
-func newLogger(jsonLogs, silent bool) zerolog.Logger {
+func newLogger(jsonLogs, debug, silent bool) zerolog.Logger {
 	if silent {
 		return zerolog.Nop()
 	}
+
+	var l zerolog.Logger
 	if jsonLogs {
-		return zerolog.New(os.Stdout).With().Timestamp().Logger()
+		l = zerolog.New(os.Stdout).With().Timestamp().Logger()
 	} else {
 		writer := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339, NoColor: true}
-		return zerolog.New(writer).With().Timestamp().Logger()
+		l = zerolog.New(writer).With().Timestamp().Logger()
 	}
+	if debug {
+		l = l.Level(zerolog.DebugLevel)
+	} else {
+		l = l.Level(zerolog.InfoLevel)
+	}
+	return l
 }
 
 func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 
-	var silent bool = false
-	var jsonLogs bool = false
-	flaggy.Bool(&silent, "s", "silent", "disable all logging output")
-	flaggy.Bool(&jsonLogs, "j", "json-logs", "enable JSON formatted logs")
+	var logsSilent bool = false
+	var logsJson bool = false
+	var logsDebug bool = false
+	flaggy.Bool(&logsSilent, "s", "silent", "disable all logging output")
+	flaggy.Bool(&logsJson, "j", "json-logs", "enable JSON formatted logs")
+	flaggy.Bool(&logsDebug, "d", "debug", "enable debug logging")
 
 	var commandPortHealthCheckHostname string = constants.LOCALHOST
 	var commandPortHealthCheckPort int = constants.HTTP_STATUS_CODE_UNSET
@@ -76,18 +86,25 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	commandURLCheck.Description = "Healthcheck that checks if a specific URL is reachable (HTTP status code 200-399)"
 	commandURLCheck.String(&commandURLCheckURL, "", "url", "URL to check")
 
+	var commandProcessHealthCheckProcessName string = ""
+	commandProcessHealthCheck := flaggy.NewSubcommand("check-process")
+	commandProcessHealthCheck.Description = "Healthcheck that checks if a specific process is running (linux only)"
+	commandProcessHealthCheck.String(&commandProcessHealthCheckProcessName, "", "process", "name of the process to check")
+
 	flaggy.AttachSubcommand(commandPortHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPCodeHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPTextHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPJSONHealthCheck, 1)
 	flaggy.AttachSubcommand(commandURLCheck, 1)
+	flaggy.AttachSubcommand(commandProcessHealthCheck, 1)
 
 	flaggy.SetDescription("single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.")
 	flaggy.SetVersion("1.0.0")
 	flaggy.DisableCompletion()
 	flaggy.Parse()
 
-	logger = newLogger(jsonLogs, silent)
+	logger = newLogger(logsJson, logsDebug, logsSilent)
+	healthchecks.Logger = logger
 
 	switch {
 	case commandPortHealthCheck.Used:
@@ -126,6 +143,10 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 			JSONPath:      commandHTTPJSONHealthCheckJSONPath,
 			ExpectedValue: commandHTTPJSONHealthCheckExpectedValue,
 			Insensitive:   commandHTTPJSONHealthCheckInsensitive,
+		}, nil
+	case commandProcessHealthCheck.Used:
+		return &healthchecks.ProcessHealthCheck{
+			ProcessName: commandProcessHealthCheckProcessName,
 		}, nil
 	default:
 		return nil, fmt.Errorf("no subcommand provided")

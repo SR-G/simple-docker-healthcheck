@@ -32,6 +32,13 @@ func (h *HTTPHealthCheckJSONPath) Execute() (bool, error) {
 		return false, fmt.Errorf("response is not a valid JSON: %w", err)
 	}
 
+	// pretty print the retrieved JSON response for better debugging
+	prettyPrintJSON := response
+	if prettyJSONBytes, err := json.MarshalIndent(jsonObject, "", "  "); err == nil {
+		prettyPrintJSON = string(prettyJSONBytes)
+	}
+	Logger.Debug().Msg("retrieved response body :\n" + prettyPrintJSON)
+
 	result, err := jsonpath.Get(h.JSONPath, jsonObject)
 	if err != nil {
 		return false, err

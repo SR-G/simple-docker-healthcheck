@@ -6,7 +6,11 @@ import (
 	"net/http"
 	"simple-docker-healthcheck/constants"
 	"strings"
+
+	"github.com/rs/zerolog"
 )
+
+var Logger zerolog.Logger = zerolog.Nop()
 
 func isURLValid(url string) error {
 	if url == "" {
