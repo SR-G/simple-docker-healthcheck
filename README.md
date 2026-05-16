@@ -97,7 +97,7 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "--port", "808
 | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `curl -f http://localhost:8334/about \|\| exit 1`                         | `/sdh check-url --url http://localhost:8334/about`                                      |
 | `curl localhost:3000/api/health 2>/dev/null \| grep -i -q "ok"`           | `/sdh check-http-text --url localhost:3000/api/health --text "ok" -i`                   |
-| `bash -c "echo -n '' > /dev/tcp/127.0.0.1/8080"`                          | `/sdh check-port --hostname 127.0.01 --port 9000`                                       |
+| `bash -c "echo -n '' > /dev/tcp/127.0.0.1/8080"`                          | `/sdh check-port --hostname 127.0.0.1 --port 9000`                                      |
 | `netstat -ltn 2>/dev/null \| grep -c 9000`                                | `/sdh check-port --port 9000`                                                           |
 | `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                        |
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
@@ -145,3 +145,4 @@ simple-docker-healthcheck:latest   96ea9531359e       5.46MB             0B
 
 - https://github.com/bratteng/docker-healthcheck
 - https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178
+- https://itnext.io/healthchecks-with-distroless-containers-262a52abc31e
