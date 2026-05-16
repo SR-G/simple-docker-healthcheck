@@ -27,6 +27,7 @@ type HTTPHealthCheckText struct {
 	URL string
 
 	ExpectedText string
+	Insensitive  bool
 }
 
 type HTTPHealthCheckJSONPath struct {
@@ -34,9 +35,15 @@ type HTTPHealthCheckJSONPath struct {
 
 	JSONPath      string
 	ExpectedValue string
+	Insensitive   bool
 }
 
 func retrieveHTTPResponse(url string) (int, string, error) {
+
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		url = "http://" + url
+	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -90,6 +97,11 @@ func (h *HTTPHealthCheckText) Execute() (bool, error) {
 		return false, err
 	}
 
+	if h.Insensitive {
+		response = strings.ToLower(response)
+		h.ExpectedText = strings.ToLower(h.ExpectedText)
+	}
+
 	if strings.Contains(response, h.ExpectedText) {
 		return true, nil
 	} else {
@@ -118,6 +130,12 @@ func (h *HTTPHealthCheckJSONPath) Execute() (bool, error) {
 	if !ok {
 		return false, fmt.Errorf("found content value at JSONPath %s is not a string %s", h.JSONPath, string(responseValue))
 	}
+
+	if h.Insensitive {
+		responseValue = strings.ToLower(responseValue)
+		h.ExpectedValue = strings.ToLower(h.ExpectedValue)
+	}
+
 	if responseValue == h.ExpectedValue {
 		return true, nil
 	} else {
