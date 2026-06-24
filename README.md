@@ -1,10 +1,26 @@
 # `simple-docker-healthcheck` (`sdh`)
 
-`simple-docker-healthcheck` is a standalone binary, written in GOLANG, allowing to ease and homogeneize the writing of DOCKER `HEALTHECHECK` commands. Also works with distroless images (i.e., even if curl, netstat, nc, ... are not available in the image, allowing to keep image size under control and maintain a good level of security).
+`simple-docker-healthcheck` is a standalone binary, written in GOLANG, allowing to ease and homogeneize the writing of DOCKER `HEALTHECHECK` commands. 
+
+This allows to use the exact same binary for multiple kind of healthchecks : 
+
+- Checking if a port is opened at TCP level (replaces `netstat`, `nc`)
+- Checking if a URL is reachable (replaces `wget`, `curl`)
+- Checking the HTTP code of a URL (either a specific value, either a range) (replaces `wget`, `curl`)
+- Checking is a specific TEXT string is available in the response of a URL call (replaces `wget`, `curl` + `grep`)
+- Checking a JSON-Path expression in the response returned by a URL call (replaces `wget`, `curl` + `jq`)
+- Checking a process in-memory (replaces `ps` - a few DOCKER parent images may not be providing a shell and a ps command)
+
+Also works very well with distroless images (i.e., even if curl, netstat, nc, ... are not available in the image), allowing : 
+
+- to keep image size under control (no need to add extra dependencies)
+- to maintain a good level of security (only one extra single binary to be added for the healthcheck)
 
 ## Cookbooks
 
-### Commands
+You'll find below some examples, and at the end a "transformation table" between "legacy" commands and `sdh` counterparts.
+
+### Commands (flags)
 
 ```bash
 simple-docker-healthcheck - single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.
@@ -38,7 +54,7 @@ Possible error codes :
 Note : if the project is named `simple-docker-healthcheck` (i.e., a self-explanatory name), the binary has been renamed to `sdh` (for the sake of brevity).
 
 
-### Check that one port is accessible
+### Recipe - Check that one port is accessible
 
 ```bash
 sdh check-port --port 32400
@@ -47,27 +63,27 @@ sdh check-port --hostname localhost --port 32400
 sdh check-port --hostname mysql --port 3306
 ```
 
-### Check that a remote URL returns a specific HTTP Status Code
+### Recipe - Check that a remote URL returns a specific HTTP Status Code
 
 ```bash
 sdh check-http-code --url "https://www.wikipedia.org/" --status-code 200
 ```
 
-### Check that a remote URL returns an HTTP Status Code included in a specific range
+### Recipe - Check that a remote URL returns an HTTP Status Code included in a specific range
 
 ```bash
 sdh check-http-code --url "https://www.wikipedia.org/" 
 --min-status-code 0 --max-status-code 399
 ```
 
-### Check that a remote URL contains a specific test
+### Recipe - Check that a remote URL contains a specific test
 
 ```bash
 sdh check-http-text --url "https://www.wikipedia.org/" --text "encyclopedia"
 sdh check-http-text --url "https://www.wikipedia.org/" --text "EnCyCloPediA" --insensitive
 ```
 
-### Check that a remote URL responding a JSON content has an expected value in a given JSONPath
+### Recipe - Check that a remote URL responding a JSON content has an expected value in a given JSONPath
 
 ```bash
 sdh check-http-json --url "https://time.tensin.org/" --json-path '$.date' --value '2026-05-16'
@@ -89,13 +105,15 @@ See JSONPath documentation : https://goessner.net/articles/JsonPath/
 
 ### Docker integration
 
+You can directly embed the binary from the corresponding `sdh` docker image published in `Github Repositories`
+
 ```dockerfile
 COPY --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
 
 HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "--port", "8080" ]
 ```
 
-### Command mappings between legacy healthchecks and SDH usage
+### Command mappings between legacy healthchecks and `sdh` usage
 
 | Instead of ...                                                            | Use ...                                                                                 |
 | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -107,10 +125,11 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "--port", "808
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
 
 
+## DEV Activities
 
-## Build
+### Build
 
-### Build the binary
+#### Build the binary
 
 ```bash
 $ CGO_ENABLED=0 go build -ldflags "-s -w" .
@@ -123,8 +142,9 @@ Or use the makefile :
 make build
 make docker-build
 make docker-run
+```
 
-### Build the docker image
+#### Build the docker image
 
 ```bash
 docker build . -t simple-docker-healthcheck
@@ -155,6 +175,6 @@ Note : this is just a preliminary investigation, for now the binaries are not re
 
 ## Links
 
-- `docker-healthcheck` : a similar preliminary implementation (https://github.com/bratteng/docker-healthcheck) (archived)
-- usage of that `docker-healthcheck` binary in the NGINX docker image, directly from the docker container, as an example of usage (https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178)
-- https://itnext.io/healthchecks-with-distroless-containers-262a52abc31e
+- `docker-healthcheck` : a similar preliminary implementation and has been a source of inspiration (link : https://github.com/bratteng/docker-healthcheck) (the original project has been archived, this one is not a fork but a full/more complete rewrite)
+- usage of that `docker-healthcheck` binary in the NGINX docker image, directly from the docker container, as an example of usage : https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178
+- General discussion on healthcheck with distroless containers : https://itnext.io/healthchecks-with-distroless-containers-262a52abc31e
