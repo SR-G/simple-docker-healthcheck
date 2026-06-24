@@ -4,12 +4,12 @@
 
 This allows to use the exact same binary for multiple kind of healthchecks : 
 
-- Checking if a port is opened at TCP level (replaces `netstat`, `nc`)
-- Checking if a URL is reachable (replaces `wget`, `curl`)
-- Checking the HTTP code of a URL (either a specific value, either a range) (replaces `wget`, `curl`)
-- Checking is a specific TEXT string is available in the response of a URL call (replaces `wget`, `curl` + `grep`)
-- Checking a JSON-Path expression in the response returned by a URL call (replaces `wget`, `curl` + `jq`)
-- Checking a process in-memory (replaces `ps` - a few DOCKER parent images may not be providing a shell and a ps command)
+- **Checking if a port is opened at TCP level** (replaces `netstat`, `nc`)
+- **Checking if a URL is reachable** (replaces `wget`, `curl`)
+- **Checking the HTTP code of a URL** (either a specific value, either a range) (replaces `wget`, `curl`)
+- **Checking is a specific TEXT string is found in the response of a URL call** (replaces `wget`, `curl` + `grep`)
+- **Checking a JSON-Path expression in the response returned by a URL call** (replaces `wget`, `curl` + `jq`)
+- **Checking for a specific process in-memory** (replaces `ps` - a few DOCKER parent images may not be providing a shell and a ps command)
 
 Also works very well with distroless images (i.e., even if curl, netstat, nc, ... are not available in the image), allowing : 
 
