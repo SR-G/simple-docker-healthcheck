@@ -9,7 +9,7 @@ BUILD_DIR := $(shell echo "${PWD}")/bin
 DISTRIBUTION_DIR := $(shell echo "${PWD}")/distribution
 
 VERSION=1.0.0
-VERSION_LABEL=SNAPSHOT
+VERSION_LABEL=RELEASE
 PACKAGE=simple-docker-healthcheck
 BUILD_TIME=$(shell date "+%FT%T%z")
 
