@@ -51,7 +51,9 @@ Possible error codes :
 | 2          | Technical error during execution                                |
 | 3          | Usage error (missing mandatory parameter for one command, etc.) |
 
-Note : if the project is named `simple-docker-healthcheck` (i.e., a self-explanatory name), the binary has been renamed to `sdh` (for the sake of brevity).
+Notes : 
+- if the project is named `simple-docker-healthcheck` (i.e., a self-explanatory name), the binary has been renamed to `sdh` (for the sake of brevity).
+- each command may have additional parameters, just use `sdh <command> --help`
 
 
 ### Recipe - Check that one port is accessible
@@ -67,6 +69,18 @@ sdh check-port --hostname mysql --port 3306
 
 ```bash
 sdh check-http-code --url "https://www.wikipedia.org/" --status-code 200
+```
+
+Example of extra parameters : 
+
+```bash
+check-http-code - Healthcheck that checks the HTTP status code of a specific URL
+
+  Flags:
+      --url               URL to check
+      --status-code       expected HTTP status code (default: 200)
+      --min-status-code   expected minimum HTTP status code (ranged healthcheck) (default: -1)
+      --max-status-code   expected maximum HTTP status code (ranged healthcheck) (default: -1)
 ```
 
 ### Recipe - Check that a remote URL returns an HTTP Status Code included in a specific range
@@ -110,7 +124,7 @@ You can directly embed the binary from the corresponding `sdh` docker image publ
 ```dockerfile
 COPY --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
 
-HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "--port", "8080" ]
+HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", "--port", "8080" ]
 ```
 
 ### Command mappings between legacy healthchecks and `sdh` usage

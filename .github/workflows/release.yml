@@ -123,8 +123,8 @@ jobs:
               <summary>Release ${{ github.ref_name }} of simpler-docker-healthcheck.</summary>
               ${{ needs.changelog.outputs.clean_changelog }}
             </details>
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           overwrite_files: true
           generate_release_notes: true
 
