@@ -176,5 +176,5 @@ Note : this is just a preliminary investigation, for now the binaries are not re
 ## Links
 
 - `docker-healthcheck` : a similar preliminary implementation and has been a source of inspiration (link : https://github.com/bratteng/docker-healthcheck) (the original project has been archived, this one is not a fork but a full/more complete rewrite)
-- usage of that `docker-healthcheck` binary in the NGINX docker image, directly from the docker container, as an example of usage : https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178
+- usage of that `docker-healthcheck` binary in the NGINX docker image, directly from the docker container, as an example of usage : [https://github.com/bratteng/docker-nginx/...](https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178)
 - General discussion on healthcheck with distroless containers : https://itnext.io/healthchecks-with-distroless-containers-262a52abc31e
