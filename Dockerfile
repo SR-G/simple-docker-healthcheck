@@ -3,4 +3,4 @@ FROM        gcr.io/distroless/static-debian12
 
 ENTRYPOINT  ["/sdh"]
 
-ADD        ./sdh /sdh
+ADD        ./distribution/sdh-linux-amd64 /sdh
