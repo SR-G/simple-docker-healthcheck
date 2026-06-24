@@ -1,4 +1,6 @@
+# `simple-docker-healthcheck` (`sdh`)
 
+`simple-docker-healthcheck` is a standalone binary, written in GOLANG, allowing to ease and homogeneize the writing of DOCKER `HEALTHECHECK` commands. Also works with distroless images (i.e., even if curl, netstat, nc, ... are not available in the image, allowing to keep image size under control and maintain a good level of security).
 
 ## Cookbooks
 
@@ -33,43 +35,45 @@ Possible error codes :
 | 2          | Technical error during execution                                |
 | 3          | Usage error (missing mandatory parameter for one command, etc.) |
 
+Note : if the project is named `simple-docker-healthcheck` (i.e., a self-explanatory name), the binary has been renamed to `sdh` (for the sake of brevity).
+
 
 ### Check that one port is accessible
 
 ```bash
-go run . check-port --port 32400
-go run . check-port --hostname localhost --port 32400
+sdh check-port --port 32400
+sdh check-port --hostname localhost --port 32400
 
-go run . check-port --hostname mysql --port 3306
+sdh check-port --hostname mysql --port 3306
 ```
 
 ### Check that a remote URL returns a specific HTTP Status Code
 
 ```bash
-go run . check-http-code --url "https://gluetun-torrents-exporter.tensin.ovh/metrics" --status-code 200
+sdh check-http-code --url "https://www.wikipedia.org/" --status-code 200
 ```
 
 ### Check that a remote URL returns an HTTP Status Code included in a specific range
 
 ```bash
-go run . check-http-code --url "https://gluetun-torrents-exporter.tensin.ovh/metrics" 
+sdh check-http-code --url "https://www.wikipedia.org/" 
 --min-status-code 0 --max-status-code 399
 ```
 
 ### Check that a remote URL contains a specific test
 
 ```bash
-go run . check-http-text --url "https://gluetun-torrents-exporter.tensin.ovh/metrics" --text "go_gc_duration_seconds_sum"
-go run . check-http-text --url "https://gluetun-torrents-exporter.tensin.ovh/metrics" --text "go_gc_duration_seconds_sum" --insensitive
+sdh check-http-text --url "https://www.wikipedia.org/" --text "encyclopedia"
+sdh check-http-text --url "https://www.wikipedia.org/" --text "EnCyCloPediA" --insensitive
 ```
 
 ### Check that a remote URL responding a JSON content has an expected value in a given JSONPath
 
 ```bash
-go run . check-http-json --url "https://time.tensin.org/" --json-path '$.date' --value '2026-05-16'
+sdh check-http-json --url "https://time.tensin.org/" --json-path '$.date' --value '2026-05-16'
 ```
 
-See JSONPath documentation : 
+See JSONPath documentation : https://goessner.net/articles/JsonPath/
 
 ```bash
 0:00 sergio@moon ~/workspaces/projects/simple-docker-healthcheck% curl https://time.tensin.org | jq 
@@ -86,7 +90,7 @@ See JSONPath documentation :
 ### Docker integration
 
 ```dockerfile
-COPY --from=ghcr.io/bratteng/healthcheck:latest /sdh /sdh
+COPY --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
 
 HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "--port", "8080" ]
 ```
@@ -113,6 +117,13 @@ $ CGO_ENABLED=0 go build -ldflags "-s -w" .
 $ upx -9 ./simple-docker-healthcheck
 ```
 
+Or use the makefile : 
+
+```bash
+make build
+make docker-build
+make docker-run
+
 ### Build the docker image
 
 ```bash
@@ -123,7 +134,7 @@ docker run -it --rm --name "test" simple-docker-healthcheck --version
 
 ### About binary compression
 
-Expected sizes / gains : 
+Expected sizes / gains when using various flags and/or UPX : 
 
 | Binary                                             | Ratio | Size   |
 | -------------------------------------------------- | ----- | ------ |
@@ -132,17 +143,18 @@ Expected sizes / gains :
 | Built with go compiler with ldflags -s -w          |       | 8.3 M  |
 | Built with go compiler with ldflags -s -w + upx -9 |       | 3.3 M  |
 
-At docker image level, then last flavor fives : 
+At docker image level, then last flavor gives : 
 
 ```
 IMAGE                              ID             DISK USAGE   CONTENT SIZE   EXTRA
-node:24-alpine                     edd927012c1e        160MB             0B        
 simple-docker-healthcheck:latest   96ea9531359e       5.46MB             0B        
 ```
+
+Note : this is just a preliminary investigation, for now the binaries are not released with UPX being used.
 
 
 ## Links
 
-- https://github.com/bratteng/docker-healthcheck
-- https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178
+- `docker-healthcheck` : a similar preliminary implementation (https://github.com/bratteng/docker-healthcheck) (archived)
+- usage of that `docker-healthcheck` binary in the NGINX docker image, directly from the docker container, as an example of usage (https://github.com/bratteng/docker-nginx/blob/15ddec93d6a47ca04f84cdf3bde8b834dee1b806/Dockerfile#L177-L178)
 - https://itnext.io/healthchecks-with-distroless-containers-262a52abc31e

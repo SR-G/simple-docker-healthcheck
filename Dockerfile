@@ -1,6 +1,6 @@
 # FROM        scratch
 FROM        gcr.io/distroless/static-debian12
 
-ENTRYPOINT  ["/simple-docker-healthcheck"]
+ENTRYPOINT  ["/sdh"]
 
-ADD        ./simple-docker-healthcheck /
+ADD        ./sdh /sdh

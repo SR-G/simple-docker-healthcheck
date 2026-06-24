@@ -14,6 +14,12 @@ import (
 var logger zerolog.Logger
 var osExit = os.Exit
 
+const (
+	PROGRAM_NAME          = "sdh"
+	PROGRAM_VERSION       = "1.0.0"    // overwritten at release time from makefile
+	PROGRAM_VERSION_LABEL = "SNAPSHOT" // overwritten at release time from makefile
+)
+
 func newLogger(jsonLogs, debug, silent bool) zerolog.Logger {
 	if silent {
 		return zerolog.Nop()
@@ -35,7 +41,6 @@ func newLogger(jsonLogs, debug, silent bool) zerolog.Logger {
 }
 
 func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
-
 	var logsSilent bool = false
 	var logsJson bool = false
 	var logsDebug bool = false
@@ -99,7 +104,7 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	flaggy.AttachSubcommand(commandProcessHealthCheck, 1)
 
 	flaggy.SetDescription("single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.")
-	flaggy.SetVersion("1.0.0")
+	flaggy.SetVersion(Version.String())
 	flaggy.DisableCompletion()
 	flaggy.Parse()
 
