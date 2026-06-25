@@ -18,6 +18,7 @@
     - [Build](#build)
       - [Build the binary](#build-the-binary)
       - [Build the docker image](#build-the-docker-image)
+      - [Release](#release)
     - [About binary compression](#about-binary-compression)
   - [Links](#links)
 
@@ -236,6 +237,17 @@ make build
 make docker-build
 (...)
 make docker-run
+```
+
+#### Release
+
+```bash
+TAG="v1.1.0-RELEASE"
+git add .
+git commit -m"chore(release): prepare release ${TAG}"
+git push github master
+git tag ${TAG}
+git push github ${TAG}
 ```
 
 ### About binary compression
