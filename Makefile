@@ -53,7 +53,7 @@ docker-build: distribution ## [RELEASE] Build docker image with multi-stage Dock
 	docker build -t ${PACKAGE} .
 
 docker-run: ## [DEV] Launch docker image (for local test purpose)
-	docker run --rm --name "${PACKAGE}" ${PACKAGE} --
+	docker run --rm --name "${PACKAGE}-test" ${PACKAGE} --version
 
 distribution: install ## [RELEASE] Build the target archive with the expected binaries
 	mkdir -p ${DISTRIBUTION_DIR}

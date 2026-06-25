@@ -157,8 +157,8 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", 
 | `netstat -ltn 2>/dev/null \| grep -c 9000`                                | `/sdh check-port --port 9000`                                                           |
 | `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                        |
 | `[ ! -f /var/run/myapp.pid ] && exit 1 `                                  | `/sdh check-file --filename /var/run/myapp.pid`  |
-| `grep -c -i "RUNNING" /var/run/myapp.pid `                                   | `/sdh check-file-content --filename /var/run/myapp.pid` --content "RUNNING" --insensitive` |
-| `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid` --regexp "[0-9]+"` |
+| `grep -c -i "RUNNING" /var/run/myapp.pid `                                | `/sdh check-file-content --filename /var/run/myapp.pid --content "RUNNING" --insensitive` |
+| `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid --regexp "[0-9]+"` |
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
 
 
