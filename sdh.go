@@ -96,12 +96,36 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	commandProcessHealthCheck.Description = "Healthcheck that checks if a specific process is running (linux only)"
 	commandProcessHealthCheck.String(&commandProcessHealthCheckProcessName, "", "process", "name of the process to check")
 
+	var commandFileHealthCheckFileName string = ""
+	commandFileHealthCheck := flaggy.NewSubcommand("check-file")
+	commandFileHealthCheck.Description = "Healthcheck that checks if a specific file is available on filesystem (like a .PID file)"
+	commandFileHealthCheck.String(&commandFileHealthCheckFileName, "", "filename", "name of the filename to check")
+
+	var commandFileContentHealthCheckFileName string = ""
+	var commandFileContentHealthCheckContent string = ""
+	var commandFileContentHealthCheckInsensitive bool = false
+	commandFileContentHealthCheck := flaggy.NewSubcommand("check-file-content")
+	commandFileContentHealthCheck.Description = "Healthcheck that checks if a specific file has a specific content"
+	commandFileContentHealthCheck.String(&commandFileContentHealthCheckFileName, "", "filename", "name of the filename to check")
+	commandFileContentHealthCheck.String(&commandFileContentHealthCheckContent, "", "content", "expected content")
+	commandFileContentHealthCheck.Bool(&commandFileContentHealthCheckInsensitive, "", "insensitive", "insensitive or not")
+
+	var commandFileRegExpHealthCheckFileName string = ""
+	var commandFileRegExpHealthCheckRegExp string = ""
+	commandFileRegExpHealthCheck := flaggy.NewSubcommand("check-file-regexp")
+	commandFileRegExpHealthCheck.Description = "Healthcheck that checks if a specific file has a specific content, thanks to a regular expression"
+	commandFileRegExpHealthCheck.String(&commandFileRegExpHealthCheckFileName, "", "filename", "name of the filename to check")
+	commandFileRegExpHealthCheck.String(&commandFileRegExpHealthCheckRegExp, "", "regexp", "regexp to be applied")
+
 	flaggy.AttachSubcommand(commandPortHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPCodeHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPTextHealthCheck, 1)
 	flaggy.AttachSubcommand(commandHTTPJSONHealthCheck, 1)
 	flaggy.AttachSubcommand(commandURLCheck, 1)
 	flaggy.AttachSubcommand(commandProcessHealthCheck, 1)
+	flaggy.AttachSubcommand(commandFileHealthCheck, 1)
+	flaggy.AttachSubcommand(commandFileContentHealthCheck, 1)
+	flaggy.AttachSubcommand(commandFileRegExpHealthCheck, 1)
 
 	flaggy.SetDescription("single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.")
 	flaggy.SetVersion(Version.String())
@@ -152,6 +176,21 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	case commandProcessHealthCheck.Used:
 		return &healthchecks.ProcessHealthCheck{
 			ProcessName: commandProcessHealthCheckProcessName,
+		}, nil
+	case commandFileHealthCheck.Used:
+		return &healthchecks.FileHealthCheck{
+			FileName: commandFileHealthCheckFileName,
+		}, nil
+	case commandFileContentHealthCheck.Used:
+		return &healthchecks.FileContentHealthCheck{
+			FileName:        commandFileContentHealthCheckFileName,
+			ExpectedContent: commandFileContentHealthCheckContent,
+			Insensitive:     commandFileContentHealthCheckInsensitive,
+		}, nil
+	case commandFileRegExpHealthCheck.Used:
+		return &healthchecks.FileRegExpHealthCheck{
+			FileName: commandFileRegExpHealthCheckFileName,
+			RegExp:   commandFileRegExpHealthCheckRegExp,
 		}, nil
 	default:
 		return nil, fmt.Errorf("no subcommand provided")

@@ -1,0 +1,5 @@
+FROM  alpine
+COPY --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
+HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", "--port", "8080" ]
+
+

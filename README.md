@@ -90,7 +90,7 @@ sdh check-http-code --url "https://www.wikipedia.org/"
 --min-status-code 0 --max-status-code 399
 ```
 
-### Recipe - Check that a remote URL contains a specific test
+### Recipe - Check that a remote URL contains a specific text
 
 ```bash
 sdh check-http-text --url "https://www.wikipedia.org/" --text "encyclopedia"
@@ -117,6 +117,26 @@ See JSONPath documentation : https://goessner.net/articles/JsonPath/
 }
 ```
 
+### Recipe - Check that a file is available on filesystem
+
+```bash
+sdh check-file --filename "/var/run/myapp.pid"
+```
+
+### Recipe - Check that a file is available on filesystem and has a specific content
+
+```bash
+sdh check-file-content --filename "/var/run/myapp.pid" --content "RUNNING" --insensitive
+```
+
+### Recipe - Check that a file is available on filesystem and is matching a REGEXP
+
+```bash
+# Check that the PID file of myapp is containing a valid digit
+sdh check-file-regexp --filename "/var/run/myapp.pid" --regexp '[0-9]+'
+```
+
+
 ### Docker integration
 
 You can directly embed the binary from the corresponding `sdh` docker image published in `Github Repositories` : https://github.com/SR-G/simple-docker-healthcheck/pkgs/container/simple-docker-healthcheck
@@ -136,6 +156,9 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", 
 | `bash -c "echo -n '' > /dev/tcp/127.0.0.1/8080"`                          | `/sdh check-port --hostname 127.0.0.1 --port 9000`                                      |
 | `netstat -ltn 2>/dev/null \| grep -c 9000`                                | `/sdh check-port --port 9000`                                                           |
 | `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                        |
+| `[ ! -f /var/run/myapp.pid ] && exit 1 `                                  | `/sdh check-file --filename /var/run/myapp.pid`  |
+| `grep -c -i "RUNNING" /var/run/myapp.pid `                                   | `/sdh check-file-content --filename /var/run/myapp.pid` --content "RUNNING" --insensitive` |
+| `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid` --regexp "[0-9]+"` |
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
 
 
