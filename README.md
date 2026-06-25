@@ -23,23 +23,28 @@ You'll find below some examples, and at the end a "transformation table" between
 ### Commands (flags)
 
 ```bash
-simple-docker-healthcheck - single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.
+sdh - single/standalone binary for performing healthchecks in Docker containers without the need for a full Docker image with multiple tools included. It supports various types of healthchecks, including port checks, HTTP status code checks, HTTP response text checks, and HTTP JSON value checks. Replacement of curl, wget, netstat, nc, ..., especially if not available in the container image.
 
   Usage:
-    simple-docker-healthcheck [check-port|check-http-code|check-http-text|check-http-json|check-url]
+    sdh [check-port|check-http-code|check-http-text|check-http-json|check-url|check-process|check-file|check-file-content|check-file-regexp]
 
   Subcommands:
-    check-port        Healthcheck that checks if a specific port is open on a host
-    check-http-code   Healthcheck that checks the HTTP status code of a specific URL
-    check-http-text   Healthcheck that checks if a specific text is present in the HTTP response body of a specific URL
-    check-http-json   Healthcheck that checks if a specific JSON value is present in the HTTP response body of a specific URL
-    check-url         Healthcheck that checks if a specific URL is reachable (HTTP status code 200-399)
+    check-port           Healthcheck that checks if a specific port is open on a host
+    check-http-code      Healthcheck that checks the HTTP status code of a specific URL
+    check-http-text      Healthcheck that checks if a specific text is present in the HTTP response body of a specific URL
+    check-http-json      Healthcheck that checks if a specific JSON value is present in the HTTP response body of a specific URL
+    check-url            Healthcheck that checks if a specific URL is reachable (HTTP status code 200-399)
+    check-process        Healthcheck that checks if a specific process is running (linux only)
+    check-file           Healthcheck that checks if a specific file is available on filesystem (like a .PID file)
+    check-file-content   Healthcheck that checks if a specific file has a specific content
+    check-file-regexp    Healthcheck that checks if a specific file has a specific content, thanks to a regular expression
 
   Flags:
         --version     Displays the program version string.
     -h  --help        Displays help with available flag, subcommand, and positional value parameters.
     -s  --silent      disable all logging output
     -j  --json-logs   enable JSON formatted logs
+    -d  --debug       enable debug logging
 ```
 
 Possible error codes : 
