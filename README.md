@@ -119,7 +119,7 @@ See JSONPath documentation : https://goessner.net/articles/JsonPath/
 
 ### Docker integration
 
-You can directly embed the binary from the corresponding `sdh` docker image published in `Github Repositories`
+You can directly embed the binary from the corresponding `sdh` docker image published in `Github Repositories` : https://github.com/SR-G/simple-docker-healthcheck/pkgs/container/simple-docker-healthcheck
 
 ```dockerfile
 COPY --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
@@ -138,6 +138,31 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", 
 | `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                        |
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
 
+
+### Example of docker integrations
+
+In a Dockerfile (see Docker Reference : https://docs.docker.com/reference/dockerfile/#healthcheck) : 
+
+```
+FROM        <my_parent_image>
+
+HEALTHCHECK --interval=60s --start-period=15s CMD /sdh check-port --port 8080
+COPY        --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
+```
+
+In a Docker Compose : 
+
+```
+services:
+    my_service:
+        image: <my_image>
+        healthcheck:
+            test: ["CMD", "/sdh", "check-port", "--port", "8080"]
+            interval: 60s
+            timeout: 30s
+            retries: 5
+            start_period: 30s  
+```
 
 ## DEV Activities
 
