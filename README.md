@@ -202,16 +202,14 @@ Or use the makefile :
 
 ```bash
 make build
-make docker-build
-make docker-run
 ```
 
 #### Build the docker image
 
 ```bash
-docker build . -t simple-docker-healthcheck
+make docker-build
 (...)
-docker run -it --rm --name "test" simple-docker-healthcheck --version
+make docker-run
 ```
 
 ### About binary compression
