@@ -1,5 +1,26 @@
 # `simple-docker-healthcheck` (`sdh`)
 
+- [`simple-docker-healthcheck` (`sdh`)](#simple-docker-healthcheck-sdh)
+  - [Cookbooks](#cookbooks)
+    - [Commands (flags)](#commands-flags)
+    - [Recipe - Check that one port is accessible](#recipe---check-that-one-port-is-accessible)
+    - [Recipe - Check that a remote URL returns a specific HTTP Status Code](#recipe---check-that-a-remote-url-returns-a-specific-http-status-code)
+    - [Recipe - Check that a remote URL returns an HTTP Status Code included in a specific range](#recipe---check-that-a-remote-url-returns-an-http-status-code-included-in-a-specific-range)
+    - [Recipe - Check that a remote URL contains a specific text](#recipe---check-that-a-remote-url-contains-a-specific-text)
+    - [Recipe - Check that a remote URL responding a JSON content has an expected value in a given JSONPath](#recipe---check-that-a-remote-url-responding-a-json-content-has-an-expected-value-in-a-given-jsonpath)
+    - [Recipe - Check that a file is available on filesystem](#recipe---check-that-a-file-is-available-on-filesystem)
+    - [Recipe - Check that a file is available on filesystem and has a specific content](#recipe---check-that-a-file-is-available-on-filesystem-and-has-a-specific-content)
+    - [Recipe - Check that a file is available on filesystem and is matching a REGEXP](#recipe---check-that-a-file-is-available-on-filesystem-and-is-matching-a-regexp)
+    - [Docker integration](#docker-integration)
+    - [Command mappings between legacy healthchecks and `sdh` usage](#command-mappings-between-legacy-healthchecks-and-sdh-usage)
+    - [Example of docker integrations](#example-of-docker-integrations)
+  - [DEV Activities](#dev-activities)
+    - [Build](#build)
+      - [Build the binary](#build-the-binary)
+      - [Build the docker image](#build-the-docker-image)
+    - [About binary compression](#about-binary-compression)
+  - [Links](#links)
+
 `simple-docker-healthcheck` is a standalone binary, written in GOLANG, allowing to ease and homogeneize the writing of DOCKER `HEALTHECHECK` commands. 
 
 This allows to use the exact same binary for multiple kind of healthchecks : 
