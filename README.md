@@ -11,6 +11,7 @@
     - [Recipe - Check that a file is available on filesystem](#recipe---check-that-a-file-is-available-on-filesystem)
     - [Recipe - Check that a file is available on filesystem and has a specific content](#recipe---check-that-a-file-is-available-on-filesystem-and-has-a-specific-content)
     - [Recipe - Check that a file is available on filesystem and is matching a REGEXP](#recipe---check-that-a-file-is-available-on-filesystem-and-is-matching-a-regexp)
+    - [Recipe - Check that a process is available in memory](#recipe---check-that-a-process-is-available-in-memory)
     - [Docker integration](#docker-integration)
     - [Command mappings between legacy healthchecks and `sdh` usage](#command-mappings-between-legacy-healthchecks-and-sdh-usage)
     - [Example of docker integrations](#example-of-docker-integrations)
@@ -19,6 +20,7 @@
       - [Build the binary](#build-the-binary)
       - [Build the docker image](#build-the-docker-image)
       - [Release](#release)
+    - [Overwrite a previous tag](#overwrite-a-previous-tag)
     - [About binary compression](#about-binary-compression)
   - [Links](#links)
 
@@ -163,6 +165,18 @@ sdh check-file-content --filename "/var/run/myapp.pid" --content "RUNNING" --ins
 sdh check-file-regexp --filename "/var/run/myapp.pid" --regexp '[0-9]+'
 ```
 
+### Recipe - Check that a process is available in memory
+
+```bash
+# Check that the process is available in memory
+sdh check-process --process "sdh'
+```
+
+Notes : 
+- most of the time, this does not make sense (as the container should exit if the main process is exited), but this may be helpful for some corner cases (s6 as the main process and multiple other sub-processes, etc.)
+- this is NOT relying on the `ps` command (only on `/proc`)
+- as a consequence, at this time, this is only working on linux and is not available with the windows binary
+
 
 ### Docker integration
 
@@ -249,6 +263,15 @@ git push github master
 git tag ${TAG}
 git push github ${TAG}
 ```
+
+### Overwrite a previous tag
+
+```bash
+TAG="v1.1.0-RELEASE"
+git tag --delete ${TAG}
+git push --delete github ${TAG}
+```
+
 
 ### About binary compression
 
