@@ -190,18 +190,18 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", 
 
 ### Command mappings between legacy healthchecks and `sdh` usage
 
-| Instead of ...                                                            | Use ...                                                                                 |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `curl -f http://localhost:8334/about \|\| exit 1`                         | `/sdh check-url --url http://localhost:8334/about`                                      |
-| `curl localhost:3000/api/health 2>/dev/null \| grep -i -q "ok"`           | `/sdh check-http-text --url localhost:3000/api/health --text "ok" -i`                   |
-| `bash -c "echo -n '' > /dev/tcp/127.0.0.1/8080"`                          | `/sdh check-port --hostname 127.0.0.1 --port 9000`                                      |
-| `netstat -ltn 2>/dev/null \| grep -c 9000`                                | `/sdh check-port --port 9000`                                                           |
-| `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                        |
-| `[ ! -f /var/run/myapp.pid ] && exit 1 `                                  | `/sdh check-file --filename /var/run/myapp.pid`  |
-| `grep -c -i "RUNNING" /var/run/myapp.pid `                                | `/sdh check-file-content --filename /var/run/myapp.pid --content "RUNNING" --insensitive` |
-| `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid --regexp "[0-9]+"` |
-| `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
-| `grep -ql '[R]oonServer.dll' /proc/[0-9]*/cmdline 2>/dev/null || exit 1`  | `/sdh check-process --process "RoonServer.dll" --insensitive |
+| Instead of ...                                                            | Use ...                                                                                   |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `curl -f http://localhost:8334/about \|\| exit 1`                         | `/sdh check-url --url http://localhost:8334/about`                                        |
+| `curl localhost:3000/api/health 2>/dev/null \| grep -i -q "ok"`           | `/sdh check-http-text --url localhost:3000/api/health --text "ok" -i`                     |
+| `bash -c "echo -n '' > /dev/tcp/127.0.0.1/8080"`                          | `/sdh check-port --hostname 127.0.0.1 --port 9000`                                        |
+| `netstat -ltn 2>/dev/null \| grep -c 9000`                                | `/sdh check-port --port 9000`                                                             |
+| `nc -z localhost 80`                                                      | `/sdh check-port --hostname localhost --port 80`                                          |
+| `[ ! -f /var/run/myapp.pid ] && exit 1`                                   | `/sdh check-file --filename /var/run/myapp.pid`                                           |
+| `grep -c -i "RUNNING" /var/run/myapp.pid`                                 | `/sdh check-file-content --filename /var/run/myapp.pid --content "RUNNING" --insensitive` |
+| `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid --regexp "[0-9]+"`                  |
+| `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"`   |
+| `grep -ql '[R]oonServer.dll' /proc/[0-9]*/cmdline 2>/dev/null \|\| exit 1`  | `/sdh check-process --process "RoonServer.dll" --insensitive`                             |
 
 
 ### Example of docker integrations
@@ -211,7 +211,7 @@ In a Dockerfile (see Docker Reference : https://docs.docker.com/reference/docker
 ```
 FROM        <my_parent_image>
 
-HEALTHCHECK --interval=60s --start-period=15s CMD /sdh check-port --port 8080
+HEALTHCHECK --interval=300s --timeout=10s --retries=5 --start-period=15s CMD /sdh check-port --port 8080
 COPY        --from=ghcr.io/sr-g/simple-docker-healthcheck:latest /sdh /sdh
 ```
 
