@@ -92,9 +92,11 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	commandURLCheck.String(&commandURLCheckURL, "", "url", "URL to check")
 
 	var commandProcessHealthCheckProcessName string = ""
+	var commandProcessHealthCheckInsensitive bool = false
 	commandProcessHealthCheck := flaggy.NewSubcommand("check-process")
 	commandProcessHealthCheck.Description = "Healthcheck that checks if a specific process is running (linux only)"
 	commandProcessHealthCheck.String(&commandProcessHealthCheckProcessName, "", "process", "name of the process to check")
+	commandProcessHealthCheck.Bool(&commandProcessHealthCheckInsensitive, "i", "insensitive", "perform case-insensitive text matching")
 
 	var commandFileHealthCheckFileName string = ""
 	commandFileHealthCheck := flaggy.NewSubcommand("check-file")
@@ -176,6 +178,7 @@ func initParametersAndParseFlags() (healthchecks.HealthCheck, error) {
 	case commandProcessHealthCheck.Used:
 		return &healthchecks.ProcessHealthCheck{
 			ProcessName: commandProcessHealthCheckProcessName,
+			Insensitive: commandProcessHealthCheckInsensitive,
 		}, nil
 	case commandFileHealthCheck.Used:
 		return &healthchecks.FileHealthCheck{

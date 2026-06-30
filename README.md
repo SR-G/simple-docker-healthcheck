@@ -201,6 +201,7 @@ HEALTHCHECK --interval=5s --timeout=10s --retries=3 CMD [ "/sdh", "check-port", 
 | `grep -c -i "RUNNING" /var/run/myapp.pid `                                | `/sdh check-file-content --filename /var/run/myapp.pid --content "RUNNING" --insensitive` |
 | `grep -c -e "[0-9]+" /var/run/myapp.pid`                                  | `/sdh check-file-regexp --filename /var/run/myapp.pid --regexp "[0-9]+"` |
 | `curl -f http://localhost/status \| jq '.status' \| grep -i -q "RUNNING"` | `/sdh check-http-json http://localhost/status --json-path '$.status' --value "RUNNING"` |
+| `grep -ql '[R]oonServer.dll' /proc/[0-9]*/cmdline 2>/dev/null || exit 1`  | `/sdh check-process --process "RoonServer.dll" --insensitive |
 
 
 ### Example of docker integrations

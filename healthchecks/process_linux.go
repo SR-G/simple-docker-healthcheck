@@ -6,9 +6,11 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/SR-G/sul"
 )
 
-func isProcessRunning(processName string) (bool, error) {
+func isProcessRunning(processName string, insensitive bool) (bool, error) {
 	entries, err := os.ReadDir("/proc")
 	if err != nil {
 		return false, err
@@ -50,8 +52,14 @@ func isProcessRunning(processName string) (bool, error) {
 			continue
 		}
 
-		if strings.Contains(cmdlineRaw, processName) {
-			return true, nil
+		if insensitive {
+			if sul.ContainsI(cmdlineRaw, processName) {
+				return true, nil
+			}
+		} else {
+			if strings.Contains(cmdlineRaw, processName) {
+				return true, nil
+			}
 		}
 	}
 
@@ -60,10 +68,11 @@ func isProcessRunning(processName string) (bool, error) {
 
 type ProcessHealthCheck struct {
 	ProcessName string
+	Insensitive bool
 }
 
 func (h *ProcessHealthCheck) Execute() (bool, error) {
-	return isProcessRunning(h.ProcessName)
+	return isProcessRunning(h.ProcessName, h.Insensitive)
 }
 
 func (h *ProcessHealthCheck) Dump() string {
